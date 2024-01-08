@@ -3,10 +3,10 @@ const { projectlistdata,workitemlistdata,projectlist,workitems } = require('../c
 
 const router = express.Router();
 
-router.post('/listdata', projectlistdata);
+//router.post('/listdata', projectlistdata);
 
 
-router.post('/workitemsdata', workitemlistdata);
+//router.post('/workitemsdata', workitemlistdata);
 
 router.post('/list', projectlist);
 
