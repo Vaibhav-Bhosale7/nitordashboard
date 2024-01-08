@@ -1,9 +1,10 @@
 const axios = require('axios');
 const Project = require('../models/project');
 const WorkItems = require('../models/workItems');
+var cron = require('node-cron');
 
-// Getting project list
-const projectlistdata = async (req, res, next) => {
+// Getting project list & saving into db
+  cron.schedule('* * * * *', async () => { 
 
   const organization = process.env.ORGANIZATION;
   const pat = process.env.ACCESS_TOKEN;
@@ -20,24 +21,21 @@ const projectlistdata = async (req, res, next) => {
 
     projectsData = JSON.stringify(projects);
 
-    // const project = new Project({ organizationName : process.env.ORGANIZATION, projects : projectsData  });
-    // await project.save();
-
       let project = await Project.findOneAndUpdate(
       { organizationName: process.env.ORGANIZATION },
       { $setOnInsert: { organizationName: process.env.ORGANIZATION, projects: projectsData } },
       { upsert: true, new: true, rawResult: true }
     );
-
-   res.json({ message: 'Projects saved' });
+      
 
   } catch (error) {
     next(error);
   }
-};
+});
 
 
-const workitemlistdata = async (req, res, next) => {
+// getting work items list and saving into db
+cron.schedule('* * * * *', async () => { 
 
   const organizationName = process.env.ORGANIZATION;
   const pat = process.env.ACCESS_TOKEN;
@@ -87,9 +85,6 @@ const workitemlistdata = async (req, res, next) => {
     res.push(workItems);
       
 
-    // const workItemsSaveData = new WorkItems({ organizationName : organizationName, projectId : element.id, projectName : element.name, workItems : workItemsData  });
-    // await workItemsSaveData.save();
-
     }
     workItemsData = JSON.stringify(res);
 
@@ -99,12 +94,11 @@ const workitemlistdata = async (req, res, next) => {
       { upsert: true, new: true, rawResult: true }
     );
 });
-    res.json({ message: 'Work items saved' });
     
   } catch (error) {
     next(error);
   }
-};
+});
 
 
 const projectlist = async (req, res, next) => {
@@ -139,4 +133,4 @@ const workitems = async (req, res, next) => {
 };
 
 
-module.exports = { projectlistdata,workitemlistdata,projectlist,workitems };
+module.exports = { projectlist,workitems };
