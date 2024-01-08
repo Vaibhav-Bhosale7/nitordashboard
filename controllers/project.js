@@ -4,7 +4,7 @@ const WorkItems = require('../models/workItems');
 var cron = require('node-cron');
 
 // Getting project list & saving into db
-  cron.schedule('* * * * *', async () => { 
+  cron.schedule('0 0 * * *', async () => { 
 
   const organization = process.env.ORGANIZATION;
   const pat = process.env.ACCESS_TOKEN;
@@ -35,7 +35,7 @@ var cron = require('node-cron');
 
 
 // getting work items list and saving into db
-cron.schedule('* * * * *', async () => { 
+cron.schedule('0 0 * * *', async () => { 
 
   const organizationName = process.env.ORGANIZATION;
   const pat = process.env.ACCESS_TOKEN;
