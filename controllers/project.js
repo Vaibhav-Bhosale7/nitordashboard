@@ -4,7 +4,7 @@ const WorkItems = require('../models/workItems');
 var cron = require('node-cron');
 
 // Getting project list & saving into db
-  cron.schedule('0 0 * * *', async () => { 
+  cron.schedule('* * * * *', async () => { 
 
   const organization = process.env.ORGANIZATION;
   const pat = process.env.ACCESS_TOKEN;
@@ -19,14 +19,19 @@ var cron = require('node-cron');
  
     const projects = response.data.value;
 
-    projectsData = JSON.stringify(projects);
+     projectsData = JSON.stringify(projects);
 
-      let project = await Project.findOneAndUpdate(
-      { organizationName: process.env.ORGANIZATION },
-      { $setOnInsert: { organizationName: process.env.ORGANIZATION, projects: projectsData } },
-      { upsert: true, new: true, rawResult: true }
-    );
+    //   let project = await Project.findOneAndUpdate(
+    //   { organizationName: process.env.ORGANIZATION },
+    //   { $setOnInsert: { organizationName: process.env.ORGANIZATION, projects: projectsData } },
+    //   { upsert: true, new: true, rawResult: true }
+    // );
       
+
+    const ProjectSave = new Project({ organizationName: process.env.ORGANIZATION, projects: projectsData  });
+    await ProjectSave.save();
+
+    console.log("project running");
 
   } catch (error) {
     next(error);
@@ -35,13 +40,13 @@ var cron = require('node-cron');
 
 
 // getting work items list and saving into db
-cron.schedule('0 0 * * *', async () => { 
+cron.schedule('* * * * *', async () => { 
 
   const organizationName = process.env.ORGANIZATION;
   const pat = process.env.ACCESS_TOKEN;
       
 
-  const projectList = await Project.findOne({ organizationName });
+  const projectList = await Project.findOne({ organizationName }).sort({_id:-1}).limit(1);
 
   const projectListData = JSON.parse(projectList.projects);
 
@@ -88,12 +93,19 @@ cron.schedule('0 0 * * *', async () => {
     }
     workItemsData = JSON.stringify(res);
 
-        let workItemsSaveData = await WorkItems.findOneAndUpdate(
-      { projectId : element.id },
-      { $setOnInsert: { organizationName : organizationName, projectId : element.id, projectName : element.name, workItems : workItemsData } },
-      { upsert: true, new: true, rawResult: true }
-    );
+    //     let workItemsSaveData = await WorkItems.findOneAndUpdate(
+    //   { projectId : element.id },
+    //   { $setOnInsert: { organizationName : organizationName, projectId : element.id, projectName : element.name, workItems : workItemsData } },
+    //   { upsert: true, new: true, rawResult: true }
+    // );
+
+    const WorkItemsSave = new WorkItems({ organizationName : organizationName, projectId : element.id, projectName : element.name, workItems : workItemsData  });
+    await WorkItemsSave.save();
+
+    
 });
+
+console.log("work items running");
     
   } catch (error) {
     next(error);
@@ -106,7 +118,7 @@ const projectlist = async (req, res, next) => {
    
 
   try {
-    const projectList = await Project.findOne({ organizationName });
+    const projectList = await Project.findOne({ organizationName }).sort({_id:-1}).limit(1);
 
     const projectListData = JSON.parse(projectList.projects);
     
@@ -121,7 +133,7 @@ const workitems = async (req, res, next) => {
    const { projectId } = req.body;
 
   try {
-    const workItems = await WorkItems.findOne({ projectId });
+    const workItems = await WorkItems.findOne({ projectId }).sort({_id:-1}).limit(1);
 
     const WorkItemsData = JSON.parse(workItems.workItems);
     
