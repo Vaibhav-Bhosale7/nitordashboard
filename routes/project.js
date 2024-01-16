@@ -1,5 +1,5 @@
 const express = require('express');
-const { projectlistdata,workitemlistdata,projectlist,workitems } = require('../controllers/project');
+const { userlist,projectlist,workitems } = require('../controllers/project');
 
 const router = express.Router();
 
@@ -11,5 +11,6 @@ const router = express.Router();
 router.post('/list', projectlist);
 
 router.post('/workitems', workitems);
+router.post('/userlist', userlist);
 
 module.exports = router;
